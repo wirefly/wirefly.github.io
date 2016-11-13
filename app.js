@@ -1,4 +1,4 @@
-var currencyList = [['AUD', 'au'], ['BGN', 'bg'], ['BRL', 'br'], ['CAD', 'ca'], ['CHF', 'ch'], ['CZK', 'cz'], ['DKK', 'dk'], ['EUR', ''], ['GBP', 'gb'], ['HUF', 'hu'], ['JPY', 'jp'], ['NOK', 'no'], ['NZD', 'nz'], ['PLN', 'pl'], ['RON', 'ro'], ['SEK', 'se'], ['SGD', 'sg'], ['USD', 'us']];
+var currencyList = [['USD', 'us'], ['IDR', 'id'], ['BGN', 'bg'], ['ILS', 'il'], ['GBP', 'gb'], ['DKK', 'dk'], ['CAD', 'ca'], ['JPY', 'jp'], ['HUF', 'hu'], ['RON', 'ro'], ['MYR', 'my'], ['SEK', 'se'], ['SGD', 'sg'], ['HKD', 'hk'], ['AUD', 'au'], ['CHF', 'ch'], ['KRW', 'kr'], ['CNY', 'cn'], ['TRY', 'tr'], ['HRK', 'hr'], ['NZD', 'nz'], ['THB', 'th'], ['EUR', 'eu'], ['NOK', 'no'], ['RUB', 'ru'], ['INR', 'in'], ['MXN', 'mx'], ['CZK', 'cz'], ['BRL', 'br'], ['PLN', 'pl'], ['PHP', 'ph'], ['ZAR', 'za']];
 
 
 function openDropDown(e) {
@@ -25,6 +25,10 @@ function changeDropDownVal(e) {
 }
 
 function callTransfer() {
+  $('.loading').css("display", "block");
+  $('.third').css("display", "none");
+  $('.up_button').css("display", "none");
+
   $('html, body').animate({
     scrollTop: $('.results').offset().top
   }, 1000);
@@ -33,7 +37,7 @@ function callTransfer() {
   var toCurr = $($('.dropdown')[1]).children()[0].innerText;
   var amount = $('#send_amount')[0].value;
 
-  var baseURL = "http://localhost:5000/getTransfer?";
+  var baseURL = "http://localhost:5000/getConversion?";
   var fromString = "from_curr=" + fromCurr;
   var toString = "&to_curr=" + toCurr;
   var amountString = "&amount=" + amount;
@@ -41,8 +45,25 @@ function callTransfer() {
   var url = baseURL + fromString + toString + amountString;
 
   $.get(url, function(data) {
-    $('.loader').css("display", "none");
+    $('.loading').css("display", "none");
+    $('.third').css("display", "block");
+    $('.up_button').css("display", "block");
+    $('.up_button').addClass('animated flipInX');
+    for (var i = 0; i < $('.third').length; i++) {
+      $($('.third')[i]).addClass('animated flipInX');
+    }
   });
+  setTimeout(testicle, 2000);
+}
+
+function testicle() {
+  $('.loading').css("display", "none");
+  $('.third').css("display", "block");
+  $('.up_button').css("display", "block");
+  $('.up_button').addClass('animated flipInX');
+  for (var i = 0; i < $('.third').length; i++) {
+    $($('.third')[i]).addClass('animated flipInX');
+  }
 }
 
 $(document).ready(function() {
@@ -58,8 +79,14 @@ $(document).ready(function() {
       changeDropDownVal(e);
     }
 
-    if (e.target.matches('.submit')) {
+    if (e.target.matches('.submit') || e.target.matches('.fa-refresh')) {
       callTransfer();
+    }
+
+    if (e.target.matches('.up_button') || e.target.matches('.go_up')) {
+      $('html, body').animate({
+        scrollTop: 0
+      }, 1000);
     }
   });
 
