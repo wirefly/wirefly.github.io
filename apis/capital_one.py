@@ -48,7 +48,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
 		print('account created')
 		accountId = data['objectCreated']['_id']
 		name = first_name + " " + last_name
-		account = new Account(accountId, name, currency, isBank)
+		account = Account(accountId, name, currency, isBank)
 		return account
 	else:
 		print("failed bitch ", response.text, response.reason)
