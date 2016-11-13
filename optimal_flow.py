@@ -2,10 +2,7 @@ import numpy as np
 from scipy import optimize
 from Model.BipartiteNetworkGraph import BipartiteNetworkGraph
 from Model.Payment import Payment
-<<<<<<< HEAD
 
-=======
->>>>>>> b9cab001e95a6093d268d6863ab41bc43fdd9c13
 
 def solve_optimal(payments_list):
     """
@@ -15,7 +12,8 @@ def solve_optimal(payments_list):
     :return:              total cost
     """
     cost_graph, capacity_graph = initialize(payments_list)
-    min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq = formulate_simplex(capacity_graph, cost_graph)
+    min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq = formulate_simplex(
+        capacity_graph, cost_graph)
     flow_val = run_simplex(min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq)
     # TODO: Collect and Distribute call
     return flow_val
@@ -38,10 +36,10 @@ def initialize(payments_list):
 
     for index, (net_amount, currency) in enumerate(net_payments):
         v = index + 1
-        if(net_amount < 0):
+        if (net_amount < 0):
             capacity_graph.add_edge((capacity_graph.s, v), abs(net_amount))
             cost_graph.add_edge((cost_graph.s, v), 0)
-        elif(net_amount > 0):
+        elif (net_amount > 0):
             capacity_graph.add_edge((v, capacity_graph.t), abs(net_amount))
             cost_graph.add_edge((v, cost_graph.t), 0)
 
@@ -52,8 +50,8 @@ def initialize(payments_list):
         for v in range(L, R + L):
             send_currency, receive_currency = cost_graph.get_currency(u), cost_graph.get_currency(v)
             fee_rate = send_currency.get_fee_rate(receive_currency)
-            capacity_graph.add_edge((u,v), float('inf'))
-            cost_graph.add_edge((u,v), fee_rate)
+            capacity_graph.add_edge((u, v), float('inf'))
+            cost_graph.add_edge((u, v), fee_rate)
 
     return cost_graph, capacity_graph
 
@@ -165,20 +163,11 @@ def run_simplex(c, A_equality, b_equality, A_inequality, b_inequality):
     :return:           the result of calling simplex.
     """
     opt = optimize.linprog(c, A_eq=A_equality, b_eq=b_equality, A_ub=A_inequality, b_ub=b_inequality, method='simplex')
-    print(opt) #TODO DELETE
+    print(opt)  # TODO DELETE
     return opt.fun
 
 
-<<<<<<< HEAD
-# TODO: Actually implement
-def get_currency_account(currency):
-    return 'fake bank'
-
-
-def get_transcations_for_currency(currency, total_fees, total_amount_sent):
-=======
 def get_transcations(currency_to_payment, currency_name_to_object, total_fees, total_amount_sent):
->>>>>>> b9cab001e95a6093d268d6863ab41bc43fdd9c13
     transactions = []
     for currency_name in currency_to_payment:
         payment = currency_to_payment[currency_name]
@@ -186,6 +175,6 @@ def get_transcations(currency_to_payment, currency_name_to_object, total_fees, t
         payment_amount = payment.get_amount()
         sender, receiver = payment.get_sender(), payment.get_receiver()
         transactions += [Payment(sender, currency_account, payment_amount)]
-        transactions += [Payment(currency_account, receiver - ((total_fees)*(payment_amount/total_amount_sent)), payment_amount)]
+        transactions += [
+            Payment(currency_account, receiver - ((total_fees) * (payment_amount / total_amount_sent)), payment_amount)]
     return transactions
-
