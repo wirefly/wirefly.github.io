@@ -1,7 +1,7 @@
 import requests
 import random
 import json
-from Account import Account
+from Model import Account
 
 apiKey = 'f1eefaa9631867b1e47580406a2dcc83'
 currency_list = ['USD', 'IDR', 'BGN', 'ILS', 'GBP', 'DKK', 'CAD', 'JPY', 'HUF', 'RON', 'MYR', 'SEK', 'SGD', 'HKD', 'AUD', 'CHF', 'KRW', 'CNY', 'TRY', 'HRK', 'NZD', 'THB', 'EUR', 'NOK', 'RUB', 'INR', 'MXN', 'CZK', 'BRL', 'PLN', 'PHP', 'ZAR']
@@ -128,5 +128,3 @@ def transfer(payer_id, payee_id, amount):
         print(response.text)
     else:
         print("failed bitch ", response.text, response.reason)
-
-
