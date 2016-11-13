@@ -6,6 +6,8 @@ class BipartiteNetworkGraph:
         self.s_to_L = default_values * np.ones((L,))  # Edges from s -> L
         self.R_to_T = default_values * np.ones((R,))
         self.L_to_R = default_values * np.ones((L, R))
+        self.L = L
+        self.R = R
         self.currencies = {}
         self.s, self.t = 0, L + R + 1
 
@@ -15,18 +17,18 @@ class BipartiteNetworkGraph:
     def add_edge(self, edge, weight):
         u, v = edge
         if u == self.s:
-            self.s_to_L[v] = weight
+            self.s_to_L[v - 1] = weight
         elif v == self.t:
-            self.R_to_T[u] = weight
+            self.R_to_T[u - self.L - 1] = weight
         else:
-            self.L_to_R[u, v] = weight
+            self.L_to_R[u-1, v - self.L - 1] = weight
 
     def set_currency(self, v, currency):
         self.currencies[v] = currency
 
     def get_currency(self,v):
         if v in self.currencies:
-            return self.currencies
+            return self.currencies[v]
         else:
             return None
 
