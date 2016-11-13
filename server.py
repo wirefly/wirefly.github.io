@@ -9,7 +9,7 @@ app = Flask(__name__)
 app._static_folder = ''
 # app.config.from_object(__name__)
 
-user_list = None
+user_list = co.getAllAccounts()
 
 @app.route('/getConversion')
 def retrieve_command():
@@ -40,7 +40,6 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="portnum", help="Enter port number for server", metavar=False)
     options, args = parser.parse_args()
-    user_list = co.getAllCustomers()
     if options.portnum is None:
         app.run(debug=True)
     else:
