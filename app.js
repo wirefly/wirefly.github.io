@@ -55,16 +55,16 @@ function callTransfer() {
 
   var url = baseURL + fromString + toString + amountString;
   updateResults(amount);
-  // $.get(url, function(data) {
-  //   $('.loading').css("display", "none");
-  //   $('.third').css("display", "block");
-  //   $('.up_button').css("display", "block");
-  //   $('.up_button').addClass('animated flipInX');
-  //   for (var i = 0; i < $('.third').length; i++) {
-  //     $($('.third')[i]).addClass('animated flipInX');
-  //   }
-  // });
-  setTimeout(testicle, 4000);
+  $.get(url, function(data) {
+    $('.loading').css("display", "none");
+    $('.third').css("display", "block");
+    $('.up_button').css("display", "block");
+    $('.up_button').addClass('animated flipInX');
+    for (var i = 0; i < $('.third').length; i++) {
+      $($('.third')[i]).addClass('animated flipInX');
+    }
+  });
+  // setTimeout(testicle, 4000);
 }
 
 function testicle() {

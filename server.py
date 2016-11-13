@@ -22,7 +22,7 @@ def retrieve_command():
     sender = co.addCustomer("Sender", "Account", from_curr, False)
     receiver = co.addCustomer("Receiver", "Account", to_curr, False)
     payment = Payment.Payment(sender, receiver, _amount)
-
+    print(type(user_list))
     paymentList = simulate.simulate.simulatePaymets(user_list)
     # paymentList.append(payment)
     # finalListPayments = of.solve_optimal(paymentList)

@@ -2,8 +2,8 @@ import requests
 import random
 import json
 # from Model import Account, Currency
-from Account import Account
-from Currency import Currency
+from Model.Account import Account
+from Model.Currency import Currency
 
 apiKey = 'ab66e2459d00318d1e49fa563a71c34a'
 currency_list = ['USD', 'IDR', 'BGN', 'ILS', 'GBP', 'DKK', 'CAD', 'JPY', 'HUF', 'RON', 'MYR', 'SEK', 'SGD', 'HKD', 'AUD', 'CHF', 'KRW', 'CNY', 'TRY', 'HRK', 'NZD', 'THB', 'EUR', 'NOK', 'RUB', 'INR', 'MXN', 'CZK', 'BRL', 'PLN', 'PHP', 'ZAR']
@@ -77,7 +77,7 @@ def printAllCustomers():
 
 def generateCustomers():
     customers = []
-    for x in range(0, 10):#Change the second argument to specify how many customers we want
+    for x in range(0, 100):#Change the second argument to specify how many customers we want
         customers.append(addCustomer("Customer", "Account", random.choice(currency_list), False))
     for c in currency_list:
         customers.append(addCustomer("Bank", "Account", c, True))
@@ -103,7 +103,7 @@ def saveAllAccounts(): #returns a list of all accounts in Account objects
         json.dump(data, outfile)
 def getAllAccounts():
     acctList = []
-    with open('data.txt') as data_file:    
+    with open('data.txt') as data_file:
         data = json.load(data_file)
     for x in range(0, len(data)):
         uid = data[x]['_id']
@@ -118,10 +118,13 @@ def getAllAccounts():
         acctList.append(Account(uid, name, currency, isBank, balance))
     return acctList
 def transfer(payer_id, payee_id, amount):
-    url = 'http://api.reimaginebanking.com/accounts/{}/transfers/?key={}'.format(payer_id, apiKey)
+    payer_num = payer_id.uid
+    payee_num = payee_id.uid
+    print(payer_num, payee_num)
+    url = 'http://api.reimaginebanking.com/accounts/{}/transfers/?key={}'.format(payer_num, apiKey)
     payload = {
       "medium": "balance",
-      "payee_id": payee_id,
+      "payee_id": payee_num,
       "amount": amount,
       "transaction_date": "2016-11-13",
       "description": "transfer"
