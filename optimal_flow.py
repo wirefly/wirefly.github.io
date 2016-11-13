@@ -14,9 +14,9 @@ def solve_optimal(payments_list):
     cost_graph, capacity_graph = initialize(payments_list)
     min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq = formulate_simplex(
             capacity_graph, cost_graph)
-    flow_val = run_simplex(min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq)
-    # TODO: Collect and Distribute call
-    return flow_val
+    flow_val = run_simplex(min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq).fun
+    transactions = get_transcations(payments_list, flow_val)
+    return transactions
 
 
 def initialize(payments_list):
@@ -96,13 +96,16 @@ def get_currency_to_payment_hash(payment_list):
 def get_currency_name_to_object_hash(payment_list):
     payments = {}
     for payment in payment_list:
-        sender, receiver = payment.get_sender(), payment.get_receiver()
-        if sender.get_currency() not in payments:
-            payments[sender.get_currency()] = [payment]
+        sender, receiver = payment.sender, payment.reciever
+        if sender.currency not in payments:
+            payments[sender.currency] = [payment]
         else:
-            payments[sender.get_currency()] += [payment]
+            payments[sender.currency] += [payment]
 
     return payments
+
+def get_total_amount_sent(payment_list):
+    return sum([payment.amount for payment in payment_list])
 
 
 def formulate_simplex(capacity_graph, cost_graph):
@@ -167,7 +170,12 @@ def run_simplex(c, A_equality, b_equality, A_inequality, b_inequality):
     return opt.fun
 
 
-def get_transcations(currency_to_payment, currency_name_to_object, total_fees, total_amount_sent):
+def get_transcations(payment_list, total_fees):
+
+    currency_to_payment = get_currency_to_payment_hash(payment_list)
+    currency_name_to_object = get_currency_name_to_object_hash(payment_list)
+    total_amount_sent = get_total_amount_sent(payment_list
+                                              )
     transactions = []
     for currency_name in currency_to_payment:
         payment = currency_to_payment[currency_name]
@@ -175,6 +183,5 @@ def get_transcations(currency_to_payment, currency_name_to_object, total_fees, t
         payment_amount = payment.get_amount()
         sender, receiver = payment.get_sender(), payment.get_receiver()
         transactions += [Payment(sender, currency_account, payment_amount)]
-        transactions += [
-            Payment(currency_account, receiver - ((total_fees) * (payment_amount / total_amount_sent)), payment_amount)]
+        transactions += [Payment(currency_account, receiver - ((total_fees) * (payment_amount / total_amount_sent)), payment_amount)]
     return transactions
