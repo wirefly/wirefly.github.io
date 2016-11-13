@@ -10,7 +10,4 @@ class simulate():
             userFrom = userBaseList[(0, len(userBaseList))]
             userTo = userBaseList[randint(0, len(userBaseList))]
             while userFrom.getCurrency() == userTo.getCurrency():
-
-
-
-
+                userTo = userBaseList[randint(0, len(userBaseList))]
