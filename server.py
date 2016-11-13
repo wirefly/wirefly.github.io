@@ -8,6 +8,9 @@ from Model import Currency, Account, Payment, capital_one as co
 app = Flask(__name__)
 app.config.from_object(__name__)
 
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 @app.route('/getConversion', methods=['GET', 'POST'])
 def retrieve_command():
