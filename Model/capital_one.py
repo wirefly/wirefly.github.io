@@ -2,8 +2,8 @@ import requests
 import random
 import json
 # from Model import Account, Currency
-from Model.Account import Account
-from Model.Currency import Currency
+from Account import Account
+from Currency import Currency
 
 apiKey = 'f1eefaa9631867b1e47580406a2dcc83'
 currency_list = ['USD', 'IDR', 'BGN', 'ILS', 'GBP', 'DKK', 'CAD', 'JPY', 'HUF', 'RON', 'MYR', 'SEK', 'SGD', 'HKD', 'AUD', 'CHF', 'KRW', 'CNY', 'TRY', 'HRK', 'NZD', 'THB', 'EUR', 'NOK', 'RUB', 'INR', 'MXN', 'CZK', 'BRL', 'PLN', 'PHP', 'ZAR']
@@ -38,10 +38,15 @@ def addCustomer(first_name, last_name, currency, isBank):
 
 def addAccount(first_name, last_name, customerId, currency, isBank):
     url = 'http://api.reimaginebanking.com/customers/{}/accounts?key={}'.format(customerId, apiKey)
+    iB = 1 #Replacement for isBank
+    if isBank:
+        iB = 1
+    else:
+        iB = 0
     payload = {
         "type": "Savings",
         "nickname": currency,
-        "rewards": 10000,
+        "rewards": iB,# fix for customer problems
         "balance": 1000000000
     }
     # Create a Savings Account
@@ -61,7 +66,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
         print("failed bitch ", response.text, response.reason)
         return None
 
-def getAllCustomers():
+def printAllCustomers():
     url = 'http://api.reimaginebanking.com/customers/?key={}'.format(apiKey)
     response = requests.get(url)
     print(response.status_code)
@@ -72,7 +77,7 @@ def getAllCustomers():
 
 def generateCustomers():
     customers = []
-    for x in range(0, 200):#Change the second argument to specify how many customers we want
+    for x in range(0, 10):#Change the second argument to specify how many customers we want
         customers.append(addCustomer("Customer", "Account", random.choice(currency_list), False))
     for c in currency_list:
         customers.append(addCustomer("Bank", "Account", c, True))
@@ -85,7 +90,7 @@ def printAllAccounts():
         print(response.text)
     else:
         print("failed bitch ", response.text, response.reason)
-def getAllAccounts(): #returns a list of all accounts in Account objects
+def saveAllAccounts(): #returns a list of all accounts in Account objects
     url = 'http://api.reimaginebanking.com/accounts/?key={}'.format(apiKey)
     response = requests.get(url)
     print(response.status_code)
@@ -94,20 +99,23 @@ def getAllAccounts(): #returns a list of all accounts in Account objects
     else:
         print("failed bitch ", response.text, response.reason)
     data = response.json()
+    with open('data.txt', 'w') as outfile:
+        json.dump(data, outfile)
+def getAllAccounts():
     acctList = []
+    with open('data.txt') as data_file:    
+        data = json.load(data_file)
     for x in range(0, len(data)):
-        url_acct = 'http://api.reimaginebanking.com/customers/{}/?key={}'.format(data[x]['customer_id'], apiKey)
-        response_acct = requests.get(url_acct)
-        #print(response_acct.status_code)
-        if response_acct.status_code == 200:
-            print(response_acct.text)
-        else:
-            print("failed bitch ", response_acct.text, response_acct.reason)
-        data_acct = response_acct.json()
         uid = data[x]['_id']
-        name = data_acct['first_name'] + " " + data_acct['last_name']
+        name = "Account"
         currency = data[x]['nickname']
-        isBank = data_acct['address']['street_name']
+        isBank = True
+        if(data[x]['rewards'] == 1):
+            isBank = True
+        else:
+            isBank = False
+
+        isBank = data[x]['rewards']
         balance = data[x]['balance']
         acctList.append(Account(uid, name, currency, isBank, balance))
     return acctList
