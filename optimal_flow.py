@@ -3,17 +3,20 @@ from scipy import optimize
 from Model.BipartiteNetworkGraph import BipartiteNetworkGraph
 from Model.Payment import Payment
 
+
 def solve_optimal(payments_list):
     """
     Takes in a list of Payments and finds the optimal flow values
     from country to country.
     :param payments_list: list of Payments given from the Backend
-    :return:              a list of flow values for each edge from country to country
+    :return:              total cost
     """
-    capacity_graph, cost_graph = initialize(payments_list)
-    min_weights, constraint_matrix, constraint_res = formulate_simplex(capacity_graph, cost_graph)
-    flow_vals = run_simplex(min_weights, constraint_matrix, constraint_res)
-    return flow_vals
+    cost_graph, capacity_graph = initialize(payments_list)
+    min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq = formulate_simplex(
+            capacity_graph, cost_graph)
+    flow_val = run_simplex(min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq).fun
+    transactions = get_transcations(payments_list, flow_val)
+    return transactions
 
 
 def initialize(payments_list):
@@ -33,22 +36,22 @@ def initialize(payments_list):
 
     for index, (net_amount, currency) in enumerate(net_payments):
         v = index + 1
-        if(net_amount < 0):
+        if (net_amount < 0):
             capacity_graph.add_edge((capacity_graph.s, v), abs(net_amount))
             cost_graph.add_edge((cost_graph.s, v), 0)
-        elif(net_amount > 0):
+        elif (net_amount > 0):
             capacity_graph.add_edge((v, capacity_graph.t), abs(net_amount))
             cost_graph.add_edge((v, cost_graph.t), 0)
 
         cost_graph.set_currency(v, currency)
         capacity_graph.set_currency(v, currency)
 
-    for u in range(L):
-        for v in range(R):
+    for u in range(1, L + 1):
+        for v in range(L, R + L):
             send_currency, receive_currency = cost_graph.get_currency(u), cost_graph.get_currency(v)
-            exchange_rate = send_currency.get_exchange_rate(receive_currency)
-            capacity_graph.add_edge((u,v), float('inf'))
-            cost_graph.add_edge((u,v), exchange_rate)
+            fee_rate = send_currency.get_fee_rate(receive_currency)
+            capacity_graph.add_edge((u, v), float('inf'))
+            cost_graph.add_edge((u, v), fee_rate)
 
     return cost_graph, capacity_graph
 
@@ -61,18 +64,21 @@ def calculate_net_payments(payment_list):
         :return:              list of tuples
         """
     net_payments = {}
+    currency_name_map = {}
     for payment in payment_list:
-        sender, receiver = payment.get_sender(), payment.get_receiver()
-        if sender.get_currency() not in net_payments:
-            net_payments[sender.get_currency()] = - payment.get_amount()
+        sender, receiver = payment.sender, payment.reciever
+        currency_name_map[sender.currency.country] = sender.currency
+        if sender.currency.country not in net_payments:
+            net_payments[sender.currency.country] = - payment.amount
         else:
-            net_payments[sender.get_currency()] -= payment.get_amount()
+            net_payments[sender.currency.country] -= payment.amount
 
-        if receiver.get_currency() not in net_payments:
-            net_payments[receiver.get_currency()] = payment.get_amount()
+        currency_name_map[receiver.currency.country] = receiver.currency
+        if receiver.currency.country not in net_payments:
+            net_payments[receiver.currency.country] = payment.amount
         else:
-            net_payments[sender.get_currency()] += payment.get_amount()
-    return sorted([(net_payments[currency], currency) for currency in net_payments])
+            net_payments[sender.currency.country] += payment.amount
+    return sorted([(net_payments[currency], currency_name_map[currency]) for currency in net_payments])
 
 
 def get_currency_to_payment_hash(payment_list):
@@ -90,13 +96,16 @@ def get_currency_to_payment_hash(payment_list):
 def get_currency_name_to_object_hash(payment_list):
     payments = {}
     for payment in payment_list:
-        sender, receiver = payment.get_sender(), payment.get_receiver()
-        if sender.get_currency() not in payments:
-            payments[sender.get_currency()] = [payment]
+        sender, receiver = payment.sender, payment.reciever
+        if sender.currency not in payments:
+            payments[sender.currency] = [payment]
         else:
-            payments[sender.get_currency()] += [payment]
+            payments[sender.currency] += [payment]
 
     return payments
+
+def get_total_amount_sent(payment_list):
+    return sum([payment.amount for payment in payment_list])
 
 
 def formulate_simplex(capacity_graph, cost_graph):
@@ -113,8 +122,20 @@ def formulate_simplex(capacity_graph, cost_graph):
     min_weights = np.append(min_weights, cost_graph.R_to_T)
 
     constraint_matrix = np.array([1] * L + [0] * (L * R + R))
-    constraint_matrix = np.vstack((constraint_matrix, np.ones(shape=(L, total_dim))))
-    constraint_matrix = np.vstack((constraint_matrix, np.ones(shape=(R, total_dim))))
+    for lr_edge_index in range(L):
+        mat_row = [0] * total_dim
+        for ones_index in range(L + lr_edge_index * R, L + (lr_edge_index + 1) * R):
+            mat_row[ones_index] = 1
+        constraint_matrix = np.vstack((constraint_matrix, np.array(mat_row)))
+
+    for lr_edge_index in range(R):
+        mat_row = [0] * total_dim
+        for ones_index in range(L):
+            mat_row[L + lr_edge_index + R * ones_index] = 1
+        constraint_matrix = np.vstack((constraint_matrix, np.array(mat_row)))
+
+    constraint_matrix = np.vstack((constraint_matrix, np.array([0] * (L * R + L) + [1] * R)))
+    constraint_matrix_ineq = np.eye(total_dim)
 
     protruding_edges = capacity_graph.get_out_edges(capacity_graph.s)
     terminal_edges = capacity_graph.get_in_edges(capacity_graph.t)
@@ -122,10 +143,21 @@ def formulate_simplex(capacity_graph, cost_graph):
     constraint_res = np.array([sum(protruding_edges)])
     constraint_res = np.append(constraint_res, protruding_edges)
     constraint_res = np.append(constraint_res, terminal_edges)
-    return min_weights, constraint_matrix, constraint_res
+    constraint_res = np.append(constraint_res, np.array([sum(terminal_edges)]))
+
+    constraint_res_ineq = protruding_edges
+    constraint_res_ineq = np.append(constraint_res_ineq, capacity_graph.flatten_matrix())
+    constraint_res_ineq = np.append(constraint_res_ineq, terminal_edges)
+
+    print('minimum constraints', min_weights)
+    print('A', constraint_matrix)
+    print('b', constraint_res)
+    print('A_ineq', constraint_matrix_ineq)
+    print('b_ineq', constraint_res_ineq)
+    return min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq
 
 
-def run_simplex(c, A_equality, b_equality):
+def run_simplex(c, A_equality, b_equality, A_inequality, b_inequality):
     """
     Run simplex with the given parameters.
     :param c:          the weights for the minimization function.
@@ -133,10 +165,17 @@ def run_simplex(c, A_equality, b_equality):
     :param b_equality: the values for the constraint equations.
     :return:           the result of calling simplex.
     """
-    return optimize.linprog(c, A_eq=A_equality, b_eq=b_equality, method='simplex')
+    opt = optimize.linprog(c, A_eq=A_equality, b_eq=b_equality, A_ub=A_inequality, b_ub=b_inequality, method='simplex')
+    print(opt)  # TODO DELETE
+    return opt.fun
 
 
-def get_transcations(currency_to_payment, currency_name_to_object, total_fees, total_amount_sent):
+def get_transcations(payment_list, total_fees):
+
+    currency_to_payment = get_currency_to_payment_hash(payment_list)
+    currency_name_to_object = get_currency_name_to_object_hash(payment_list)
+    total_amount_sent = get_total_amount_sent(payment_list
+                                              )
     transactions = []
     for currency_name in currency_to_payment:
         payment = currency_to_payment[currency_name]
@@ -144,6 +183,5 @@ def get_transcations(currency_to_payment, currency_name_to_object, total_fees, t
         payment_amount = payment.get_amount()
         sender, receiver = payment.get_sender(), payment.get_receiver()
         transactions += [Payment(sender, currency_account, payment_amount)]
-        transactions += [Payment(currency_account, receiver - ((total_fees)*(payment_amount/total_amount_sent)), payment_amount)]
+        transactions += [Payment(currency_account, receiver - ((total_fees) * (payment_amount / total_amount_sent)), payment_amount)]
     return transactions
-

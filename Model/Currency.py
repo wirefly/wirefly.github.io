@@ -1,3 +1,4 @@
+import numpy as np
 import json
 import sys
 
@@ -8,6 +9,9 @@ class Currency:
     """Creates currency with sender receiver and amount"""
     def __init__ (self, country):
         self.country = country
+
+    def get_fee_rate(self, currency):
+        return np.random.uniform(0.1, 0.2)
 
     def getExchangeRate(self, currency):
         with open('../rates.json') as json_data:
