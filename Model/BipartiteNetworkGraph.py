@@ -19,7 +19,7 @@ class BipartiteNetworkGraph:
         if u == self.s:
             self.s_to_L[v - 1] = weight
         elif v == self.t:
-            self.R_to_T[u - self.L - 1 - self.R] = weight
+            self.R_to_T[self.t-u] = weight
         else:
             self.L_to_R[u-1, v - self.L - 1] = weight
 

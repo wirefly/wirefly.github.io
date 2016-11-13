@@ -86,23 +86,23 @@ def get_currency_to_payment_hash(payment_list):
     for payment in payment_list:
         sender, receiver = payment.sender, payment.receiver
         if sender.currency not in payments:
-            payments[sender.currency] = [payment]
+            payments[sender.currency.country] = payment
         else:
-            payments[sender.currency] += [payment]
+            payments[sender.currency.country] = payment
 
     return payments
 
 
 def get_currency_name_to_object_hash(payment_list):
-    payments = {}
+    currencies = {}
     for payment in payment_list:
         sender, receiver = payment.sender, payment.receiver
-        if sender.currency not in payments:
-            payments[sender.currency] = [payment]
-        else:
-            payments[sender.currency] += [payment]
+        if sender.currency not in currencies:
+            currencies[sender.currency.country] = sender.currency
+        if receiver.currency not in currencies:
+            currencies[receiver.currency.country] = receiver.currency
 
-    return payments
+    return currencies
 
 def get_total_amount_sent(payment_list):
     return sum([int(payment.amount) for payment in payment_list])
@@ -183,5 +183,5 @@ def get_transcations(payment_list, total_fees):
         payment_amount = payment.amount
         sender, receiver = payment.sender, payment.receiver
         transactions += [Payment(sender, currency_account, payment_amount)]
-        transactions += [Payment(currency_account, receiver - ((total_fees) * (payment_amount / total_amount_sent)), payment_amount)]
+        transactions += [Payment(currency_account, receiver, payment_amount - ((total_fees) * (1.0 * payment_amount / total_amount_sent)))]
     return transactions

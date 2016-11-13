@@ -2,18 +2,7 @@ var currencyList = [['USD', 'us'], ['IDR', 'id'], ['BGN', 'bg'], ['ILS', 'il'], 
 
 
 function openDropDown(e) {
-  var dropList = null;
-  console.log("here");
-  if (e.matches('.fa-chevron-down')) {
-    console.log("hello");
-    if (e.matches('.1')) {
-      dropList = $($($('.dropdown')[0]).children()[2]);
-    } else {
-      dropList = $($($('.dropdown')[1]).children()[2]);
-    }
-  } else {
-    dropList = $($(e.target).children()[2]);
-  }
+  var dropList = $($(e.target).children()[2]);
   if (dropList.css("display") === "none") {
     dropList.css("display", "block");
     $(e.currentTarget).css("border-bottom-left-radius", "0em");
@@ -54,7 +43,6 @@ function callTransfer() {
   var amountString = "&amount=" + amount;
 
   var url = baseURL + fromString + toString + amountString;
-  updateResults(amount);
   $.get(url, function(data) {
     $('.loading').css("display", "none");
     $('.third').css("display", "block");
@@ -62,6 +50,13 @@ function callTransfer() {
     $('.up_button').addClass('animated flipInX');
     for (var i = 0; i < $('.third').length; i++) {
       $($('.third')[i]).addClass('animated flipInX');
+    }
+    data = JSON.parse(data);
+    if (Number(data['finalValue']) === -1) {
+      console.log("fake");
+      updateResults(amount, getRate(amount - (amount / 10), amount), getRate(0.1, 0.15));
+    } else {
+      updateResults(amount, Number(data['finalValue']), Number(data['finalRate']));
     }
   });
   // setTimeout(testicle, 4000);
@@ -78,15 +73,21 @@ function testicle() {
 }
 
 function getRate(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
+  return (Math.random() * (max - min + 1)) + min;
 }
 
-function updateResults(amount) {
-  var otherRate = getRate(10, 15);
+function updateResults(amount, ourMoney, otherRate) {
+  console.log(amount, ourMoney, otherRate);
+  if (otherRate > 1) {
+    otherRate = getRate(85, 90) / 100;
+    console.log("new rate", otherRate);
+  }
+  otherRate = Math.round(100 * (1 - otherRate));
+  ourRate = Math.round(100 * ourRate);
+  console.log(amount, ourMoney, otherRate);
   var otherMoney = amount - Math.ceil(amount * (otherRate / 100));
-  var ourRate = getRate(5, 10);
-  var ourMoney = amount - Math.floor(amount * (ourRate / 100));
-  var rateDiff = Math.abs(otherRate - ourRate);
+  var ourRate = (amount - ourMoney) / amount;
+  var rateDiff = Math.round(Math.abs(otherRate - ourRate));
   var moneyDiff = Math.abs(otherMoney - ourMoney);
 
   var valList = [otherRate, ourRate, rateDiff, otherMoney, ourMoney, moneyDiff];

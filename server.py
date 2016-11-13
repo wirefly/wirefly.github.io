@@ -59,27 +59,29 @@ def retrieve_command():
     from_curr = request.args.get('from_curr')
     to_curr = request.args.get('to_curr')
     _amount = request.values.get('amount')
-
-    fromCurrency = Currency.Currency(from_curr)
-    toCurrency = Currency.Currency(to_curr)
-    sender = co.addCustomer("Sender", "Account", from_curr, False)
-    receiver = co.addCustomer("Receiver", "Account", to_curr, False)
-    co.saveAllAccounts()
-    payment = Payment.Payment(sender, receiver, _amount)
-    print(type(user_list))
-    paymentList = simulate.simulate.simulatePaymets(user_list)
-    paymentList.append(payment)
-    finalListPayments = of.solve_optimal(paymentList)
-    finalRate = -1
-    finalValue = -1
-    for p in paymentList:
-        co.transfer(p.sender, p.receiver, p.amount)
-        if p.receiver.uid == receiver.uid:
-            print("HERE")
-            finalValue = p.amount
-            finalRate = p.sender.currency.getExchangeRate(p.receiver.currency)
-    to_return = {'finalRate': finalRate, 'finalValue': finalValue}
-    return json.dumps(to_return)
+    try:
+        fromCurrency = Currency.Currency(from_curr)
+        toCurrency = Currency.Currency(to_curr)
+        sender = co.addCustomer("Sender", "Account", from_curr, False)
+        receiver = co.addCustomer("Receiver", "Account", to_curr, False)
+        co.saveAllAccounts()
+        payment = Payment.Payment(sender, receiver, _amount)
+        print(type(user_list))
+        paymentList = simulate.simulate.simulatePaymets(user_list)
+        paymentList.append(payment)
+        finalListPayments = of.solve_optimal(paymentList)
+        finalRate = -1
+        finalValue = -1
+        for p in paymentList:
+            co.transfer(p.sender, p.receiver, p.amount)
+            if p.receiver.uid == receiver.uid:
+                print("HERE")
+                finalValue = p.amount
+                finalRate = p.sender.currency.getExchangeRate(p.receiver.currency)
+        to_return = {'finalRate': finalRate, 'finalValue': finalValue}
+        return json.dumps(to_return)
+    except IndexError:
+        return json.dumps({'finalRate': -1, 'finalValue': -1})
 
 if __name__ == "__main__":
     parser = OptionParser()
