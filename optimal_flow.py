@@ -1,6 +1,6 @@
 import numpy as np
 from scipy import optimize
-from BipartiteNetworkGraph import BipartiteNetworkGraph
+from Model.BipartiteNetworkGraph import BipartiteNetworkGraph
 
 
 def solve_optimal(payments_list):
