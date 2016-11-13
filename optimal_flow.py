@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import optimize
 from Model.BipartiteNetworkGraph import BipartiteNetworkGraph
-
+from Model.Payment import Payment
 
 def solve_optimal(payments_list):
     """
@@ -75,6 +75,30 @@ def calculate_net_payments(payment_list):
     return sorted([(net_payments[currency], currency) for currency in net_payments])
 
 
+def get_currency_to_payment_hash(payment_list):
+    payments = {}
+    for payment in payment_list:
+        sender, receiver = payment.get_sender(), payment.get_receiver()
+        if sender.get_currency() not in payments:
+            payments[sender.get_currency()] = [payment]
+        else:
+            payments[sender.get_currency()] += [payment]
+
+    return payments
+
+
+def get_currency_name_to_object_hash(payment_list):
+    payments = {}
+    for payment in payment_list:
+        sender, receiver = payment.get_sender(), payment.get_receiver()
+        if sender.get_currency() not in payments:
+            payments[sender.get_currency()] = [payment]
+        else:
+            payments[sender.get_currency()] += [payment]
+
+    return payments
+
+
 def formulate_simplex(capacity_graph, cost_graph):
     """
     Takes in a capacity graph and cost graph in order to output
@@ -112,23 +136,14 @@ def run_simplex(c, A_equality, b_equality):
     return optimize.linprog(c, A_eq=A_equality, b_eq=b_equality, method='simplex')
 
 
-# TODO: Actually implement
-def get_currency_account(currency):
-    return 'fake bank'
-
-
-class Payment():
-    def __init__(self, a, b, c):
-        return
-
-
-def get_transcations_for_currency(currency, total_fees, total_amount_sent):
+def get_transcations(currency_to_payment, currency_name_to_object, total_fees, total_amount_sent):
     transactions = []
-    currency_bank = get_currency_account(currency)
-    for payment in currency_bank.get_out_payments():
+    for currency_name in currency_to_payment:
+        payment = currency_to_payment[currency_name]
+        currency_account = currency_name_to_object[currency_name]
         payment_amount = payment.get_amount()
         sender, receiver = payment.get_sender(), payment.get_receiver()
-        transactions += [Payment(sender, currency_bank, payment_amount)]
-        transactions += [Payment(currency_bank, receiver - (total_fees)*(payment_amount/total_amount_sent), payment_amount)]
+        transactions += [Payment(sender, currency_account, payment_amount)]
+        transactions += [Payment(currency_account, receiver - ((total_fees)*(payment_amount/total_amount_sent)), payment_amount)]
     return transactions
 
