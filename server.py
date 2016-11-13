@@ -2,7 +2,6 @@ from flask import Flask, request
 from optparse import OptionParser
 import optimal_flow as of
 import simulate
-
 from Model import Currency, Account, Payment, capital_one as co
 
 
@@ -18,22 +17,24 @@ def retrieve_command():
     to_curr = request.args.get('to_curr')
     _amount = request.values.get('amount')
 
-    fromCurrency = Currency(from_curr)
-    toCurrency = Currency(to_curr)
-    sender = addCustomer("Sender","Account" , from_curr, False)
-    receiver = addCustomer("Receiver","Account" , to_curr, False)
-    payment = Payment(sender, receiver, _amount)
+    fromCurrency = Currency.Currency(from_curr)
+    toCurrency = Currency.Currency(to_curr)
+    sender = co.addCustomer("Sender","Account" , from_curr, False)
+    receiver = co.addCustomer("Receiver","Account" , to_curr, False)
+    payment = Payment.Payment(sender, receiver, _amount)
 
-    paymentList = simulatePayments(co.getAllAccounts())
-    paymentList.append(payment)
-    finalListPayments = solve_optimal(paymentList)
-    for p in finalListPayments:
+    paymentList = simulate.simulate.simulatePaymets(co.getAllAccounts())
+    # paymentList.append(payment)
+    # finalListPayments = of.solve_optimal(paymentList)
+    finalRate = None
+    finalValue = None
+    for p in paymentList:
         co.transfer(p.sender, p.receiver, p.amount)
-        if p.receiver.uid == receiver.uid {
-            
-        }
+        if p.receiver.uid == receiver.uid:
+            finalValue = p.amount
+            finalRate = p.sender.currency.getExchangeRate(p.receiver.currency)
 
-    return 
+    return finalValue, finalRate
 
 
 if __name__ == "__main__":
