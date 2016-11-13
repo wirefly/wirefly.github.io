@@ -3,6 +3,8 @@ import sys
 
 class Currency:
 
+    rateDict = dict()
+
     with open('rates.json') as json_data:
         d = json.load(json_data)
         rateDict = json.JSONDecoder().decode(d)
@@ -13,4 +15,4 @@ class Currency:
         self.country = country
 
     def getExchangeRate(self, currency):
-        return rateDict[self]
+        return self.rateDict[self.country][currency.country]
