@@ -1,9 +1,7 @@
 from flask import Flask, request
 from optparse import OptionParser
 import simulate
-import Account
-import Currency
-import Payment
+from Model import Currency, Account, Payment
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -19,9 +17,9 @@ def retrieve_command():
 
     fromCurrency = Currency(from_curr)
     toCurrency = Currency(to_curr)
-    sender = Account(uid, in_account, fromCurrency, isBank)
-    receiver = Account(uid, name, toCurrency, isBank)
-    payment = Payment(sender, reciever, _amount)
+    sender = Account(uid, in_name, fromCurrency, False)
+    receiver = Account(uid, out_name, toCurrency, False)
+    payment = Payment(sender, receiver, _amount)
 
     paymentList.append(payment)
 
