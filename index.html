@@ -34,7 +34,7 @@
       <div class="amount">
         <form>
           <label for="send_amount" class="label">amount</label>
-          <input type="number" name="send_amount" id="send_amount" value="1000"/>
+          <input type="number" name="send_amount" id="send_amount" value="3000" min="1000"/>
         </form>
       </div>
     </div>
@@ -45,24 +45,37 @@
   </div>
   <div class="results">
     <div class="loading">
-      <i class="fa fa-circle-o-notch fa-5x fa-spin loader" aria-hidden="true"></i>
+      <div class="sk-folding-cube">
+        <div class="sk-cube1 sk-cube"></div>
+        <div class="sk-cube2 sk-cube"></div>
+        <div class="sk-cube4 sk-cube"></div>
+        <div class="sk-cube3 sk-cube"></div>
+      </div>
       <span class="splash">transferring</span>
     </div>
     <div class="third">
       <div class="new_label">market rate</div>
-      <div class="rate_val"></div>
+      <div class="rate_val">69%</div>
     </div>
-    <div class="third">
-      <div class="new_label">our rate</div>
-      <div class="rate_val"></div>
+    <div class="third glowing">
+      <div class="newest_label">our rate</div>
+      <div class="ratest_val">68%</div>
     </div>
     <div class="third">
       <div class="new_label">percent difference</div>
-      <div class="rate_val"></div>
+      <div class="rate_val">1%</div>
     </div>
-    <div class="whole">
-      <div class="new_label">percent difference</div>
-      <div class="rate_val"></div>
+    <div class="third">
+      <div class="new_label">would receive</div>
+      <div class="rate_val">42000</div>
+    </div>
+    <div class="third glowing">
+      <div class="newest_label">amount received</div>
+      <div class="ratest_val">50000</div>
+    </div>
+    <div class="third">
+      <div class="new_label">total savings</div>
+      <div class="rate_val">8000</div>
     </div>
   </div>
 </body>

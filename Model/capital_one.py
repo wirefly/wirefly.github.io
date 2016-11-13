@@ -1,10 +1,10 @@
 import requests
 import json
-import Account
+from Account import Account
 
 apiKey = 'f1eefaa9631867b1e47580406a2dcc83'
 
-def createCustomer(first_name, last_name, currency, isBank):
+def addCustomer(first_name, last_name, currency, isBank):
     url = 'http://api.reimaginebanking.com/customers/?key={}'.format(apiKey)
 
     payload = {
@@ -25,7 +25,7 @@ def createCustomer(first_name, last_name, currency, isBank):
     )
     data = response.json()
     if response.status_code == 201:
-        print('account created')
+        print('customer created')
         customerId = data['objectCreated']['_id']
         return addAccount(first_name, last_name, customerId, currency, isBank)
     else:
@@ -47,6 +47,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
             data=json.dumps(payload),
             headers={'content-type': 'application/json'},
     )
+    data = response.json()
     if response.status_code == 201:
         print('account created')
         accountId = data['objectCreated']['_id']
@@ -57,12 +58,13 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
         print("failed bitch ", response.text, response.reason)
         return None
 
-
 def getAllCustomers():
     url = 'http://api.reimaginebanking.com/customers/?key={}'.format(apiKey)
     response = requests.get(url)
-    if response.status_code == 201:
+    print(response.status_code)
+    if response.status_code == 200:
         print(response.text)
     else:
         print("failed bitch ", response.text, response.reason)
-createCustomer("John", "Smith", "USD", False)
+
+
