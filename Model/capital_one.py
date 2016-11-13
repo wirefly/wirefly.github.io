@@ -114,8 +114,6 @@ def getAllAccounts():
             isBank = True
         else:
             isBank = False
-
-        isBank = data[x]['rewards']
         balance = data[x]['balance']
         acctList.append(Account(uid, name, currency, isBank, balance))
     return acctList
