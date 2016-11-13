@@ -102,9 +102,5 @@ def transfer(payer_id, payee_id, amount):
         print(response.text)
     else:
         print("failed bitch ", response.text, response.reason)
-list_thing= generateCustomers();
-for l in list_thing:
-    l.printAccount()
-
 
 
