@@ -95,7 +95,7 @@ def saveAllAccounts(): #returns a list of all accounts in Account objects
     response = requests.get(url)
     print(response.status_code)
     if response.status_code == 200:
-        print(response.text)
+        print('Saved Accounts')
     else:
         print("failed bitch ", response.text, response.reason)
     data = response.json()

@@ -21,6 +21,7 @@ def retrieve_command():
     toCurrency = Currency.Currency(to_curr)
     sender = co.addCustomer("Sender", "Account", from_curr, False)
     receiver = co.addCustomer("Receiver", "Account", to_curr, False)
+    co.saveAllAccounts()
     payment = Payment.Payment(sender, receiver, _amount)
     print(type(user_list))
     paymentList = simulate.simulate.simulatePaymets(user_list)
