@@ -2,7 +2,18 @@ var currencyList = [['USD', 'us'], ['IDR', 'id'], ['BGN', 'bg'], ['ILS', 'il'], 
 
 
 function openDropDown(e) {
-  var dropList = $($(e.target).children()[2]);
+  var dropList = null;
+  console.log("here");
+  if (e.matches('.fa-chevron-down')) {
+    console.log("hello");
+    if (e.matches('.1')) {
+      dropList = $($($('.dropdown')[0]).children()[2]);
+    } else {
+      dropList = $($($('.dropdown')[1]).children()[2]);
+    }
+  } else {
+    dropList = $($(e.target).children()[2]);
+  }
   if (dropList.css("display") === "none") {
     dropList.css("display", "block");
     $(e.currentTarget).css("border-bottom-left-radius", "0em");
@@ -94,6 +105,7 @@ $(document).ready(function() {
 
   $(window).on('click', function(e) {
     if (e.target.matches('.dropdown') || e.target.matches('.fa-chevron-down')) {
+      console.log("up");
       openDropDown(e);
     } else {
       $('.currency_list').css("display", "none");
