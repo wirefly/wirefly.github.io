@@ -5,7 +5,7 @@ import json
 from Account import Account
 from Currency import Currency
 
-apiKey = 'f1eefaa9631867b1e47580406a2dcc83'
+apiKey = 'ab66e2459d00318d1e49fa563a71c34a'
 currency_list = ['USD', 'IDR', 'BGN', 'ILS', 'GBP', 'DKK', 'CAD', 'JPY', 'HUF', 'RON', 'MYR', 'SEK', 'SGD', 'HKD', 'AUD', 'CHF', 'KRW', 'CNY', 'TRY', 'HRK', 'NZD', 'THB', 'EUR', 'NOK', 'RUB', 'INR', 'MXN', 'CZK', 'BRL', 'PLN', 'PHP', 'ZAR']
 def addCustomer(first_name, last_name, currency, isBank):
     url = 'http://api.reimaginebanking.com/customers/?key={}'.format(apiKey)
