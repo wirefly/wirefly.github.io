@@ -2,10 +2,6 @@ import numpy as np
 from scipy import optimize
 from Model.BipartiteNetworkGraph import BipartiteNetworkGraph
 from Model.Payment import Payment
-<<<<<<< HEAD
-
-=======
->>>>>>> b9cab001e95a6093d268d6863ab41bc43fdd9c13
 
 def solve_optimal(payments_list):
     """
@@ -169,16 +165,12 @@ def run_simplex(c, A_equality, b_equality, A_inequality, b_inequality):
     return opt.fun
 
 
-<<<<<<< HEAD
 # TODO: Actually implement
 def get_currency_account(currency):
     return 'fake bank'
 
 
-def get_transcations_for_currency(currency, total_fees, total_amount_sent):
-=======
 def get_transcations(currency_to_payment, currency_name_to_object, total_fees, total_amount_sent):
->>>>>>> b9cab001e95a6093d268d6863ab41bc43fdd9c13
     transactions = []
     for currency_name in currency_to_payment:
         payment = currency_to_payment[currency_name]
