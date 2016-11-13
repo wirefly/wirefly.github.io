@@ -115,7 +115,7 @@ def getAllAccounts():
         else:
             isBank = False
         balance = data[x]['balance']
-        acctList.append(Account(uid, name, currency, isBank, balance))
+        acctList.append(Account(uid, name, Currency(currency), isBank, int(balance)))
     return acctList
 def transfer(payer_id, payee_id, amount):
     payer_num = payer_id.uid

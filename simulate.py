@@ -5,7 +5,7 @@ class simulate():
 
     def simulatePaymets(userBaseList):
         paymentList = []
-        n = 10000
+        n = 20
         while n > 0:
             userFrom = userBaseList[randint(0, len(userBaseList)) - 1]
             userTo = userBaseList[randint(0, len(userBaseList)) - 1]

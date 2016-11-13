@@ -14,7 +14,7 @@ def solve_optimal(payments_list):
     cost_graph, capacity_graph = initialize(payments_list)
     min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq = formulate_simplex(
             capacity_graph, cost_graph)
-    flow_val = run_simplex(min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq).fun
+    flow_val = run_simplex(min_weights, constraint_matrix, constraint_res, constraint_matrix_ineq, constraint_res_ineq)
     transactions = get_transcations(payments_list, flow_val)
     return transactions
 
@@ -66,29 +66,29 @@ def calculate_net_payments(payment_list):
     net_payments = {}
     currency_name_map = {}
     for payment in payment_list:
-        sender, receiver = payment.sender, payment.reciever
+        sender, receiver = payment.sender, payment.receiver
         currency_name_map[sender.currency.country] = sender.currency
         if sender.currency.country not in net_payments:
             net_payments[sender.currency.country] = - payment.amount
         else:
-            net_payments[sender.currency.country] -= payment.amount
+            net_payments[sender.currency.country] -= int(payment.amount)
 
         currency_name_map[receiver.currency.country] = receiver.currency
         if receiver.currency.country not in net_payments:
             net_payments[receiver.currency.country] = payment.amount
         else:
-            net_payments[sender.currency.country] += payment.amount
-    return sorted([(net_payments[currency], currency_name_map[currency]) for currency in net_payments])
+            net_payments[sender.currency.country] += int(payment.amount)
+    return sorted([(net_payments[currency], currency_name_map[currency]) for currency in net_payments], key=lambda x: x[0])
 
 
 def get_currency_to_payment_hash(payment_list):
     payments = {}
     for payment in payment_list:
-        sender, receiver = payment.get_sender(), payment.get_receiver()
-        if sender.get_currency() not in payments:
-            payments[sender.get_currency()] = [payment]
+        sender, receiver = payment.sender, payment.receiver
+        if sender.currency not in payments:
+            payments[sender.currency] = [payment]
         else:
-            payments[sender.get_currency()] += [payment]
+            payments[sender.currency] += [payment]
 
     return payments
 
@@ -96,7 +96,7 @@ def get_currency_to_payment_hash(payment_list):
 def get_currency_name_to_object_hash(payment_list):
     payments = {}
     for payment in payment_list:
-        sender, receiver = payment.sender, payment.reciever
+        sender, receiver = payment.sender, payment.receiver
         if sender.currency not in payments:
             payments[sender.currency] = [payment]
         else:
@@ -105,7 +105,7 @@ def get_currency_name_to_object_hash(payment_list):
     return payments
 
 def get_total_amount_sent(payment_list):
-    return sum([payment.amount for payment in payment_list])
+    return sum([int(payment.amount) for payment in payment_list])
 
 
 def formulate_simplex(capacity_graph, cost_graph):
@@ -180,8 +180,8 @@ def get_transcations(payment_list, total_fees):
     for currency_name in currency_to_payment:
         payment = currency_to_payment[currency_name]
         currency_account = currency_name_to_object[currency_name]
-        payment_amount = payment.get_amount()
-        sender, receiver = payment.get_sender(), payment.get_receiver()
+        payment_amount = payment.amount
+        sender, receiver = payment.sender, payment.receiver
         transactions += [Payment(sender, currency_account, payment_amount)]
         transactions += [Payment(currency_account, receiver - ((total_fees) * (payment_amount / total_amount_sent)), payment_amount)]
     return transactions
