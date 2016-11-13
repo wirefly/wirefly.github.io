@@ -15,6 +15,11 @@ body {
   margin-bottom: 1em;
 }
 
+img {
+  height: 1.5em;
+  width: 1.5em;
+}
+
 .modal {
   background-color: #3DE37B;
   color: white;
@@ -208,6 +213,10 @@ form {
   height: 20vw;
   padding: .6em;
   box-sizing: border-box;
+
+  &:hover {
+    transform: scale(1.5);
+  }
 }
 
 .glowing {

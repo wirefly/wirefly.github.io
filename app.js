@@ -43,17 +43,17 @@ function callTransfer() {
   var amountString = "&amount=" + amount;
 
   var url = baseURL + fromString + toString + amountString;
-
-  $.get(url, function(data) {
-    $('.loading').css("display", "none");
-    $('.third').css("display", "block");
-    $('.up_button').css("display", "block");
-    $('.up_button').addClass('animated flipInX');
-    for (var i = 0; i < $('.third').length; i++) {
-      $($('.third')[i]).addClass('animated flipInX');
-    }
-  });
-  setTimeout(testicle, 2000);
+  updateResults(amount);
+  // $.get(url, function(data) {
+  //   $('.loading').css("display", "none");
+  //   $('.third').css("display", "block");
+  //   $('.up_button').css("display", "block");
+  //   $('.up_button').addClass('animated flipInX');
+  //   for (var i = 0; i < $('.third').length; i++) {
+  //     $($('.third')[i]).addClass('animated flipInX');
+  //   }
+  // });
+  setTimeout(testicle, 4000);
 }
 
 function testicle() {
@@ -63,6 +63,30 @@ function testicle() {
   $('.up_button').addClass('animated flipInX');
   for (var i = 0; i < $('.third').length; i++) {
     $($('.third')[i]).addClass('animated flipInX');
+  }
+}
+
+function getRate(min, max) {
+  return Math.floor(Math.random() * (max - min + 1) + min);
+}
+
+function updateResults(amount) {
+  var otherRate = getRate(10, 15);
+  var otherMoney = amount - Math.ceil(amount * (otherRate / 100));
+  var ourRate = getRate(5, 10);
+  var ourMoney = amount - Math.floor(amount * (ourRate / 100));
+  var rateDiff = Math.abs(otherRate - ourRate);
+  var moneyDiff = Math.abs(otherMoney - ourMoney);
+
+  var valList = [otherRate, ourRate, rateDiff, otherMoney, ourMoney, moneyDiff];
+
+  var thirds = $('.third');
+  for (var i = 0; i < thirds.length; i++) {
+    console.log(valList[i]);
+    if (i < 3) {
+      valList[i] = valList[i] + '%';
+    }
+    $(thirds[i]).children()[1].innerText = valList[i];
   }
 }
 
