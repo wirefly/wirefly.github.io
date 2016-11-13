@@ -70,7 +70,7 @@ def getAllCustomers():
 
 def generateCustomers():
     customers = []
-    for x in range(0, 10):#Change the second argument to specify how many customers we want
+    for x in range(0, 200):#Change the second argument to specify how many customers we want
         customers.append(addCustomer("Customer", "Account", random.choice(currency_list), False))
     for c in currency_list:
         customers.append(addCustomer("Bank", "Account", c, True))
