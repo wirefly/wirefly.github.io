@@ -4,12 +4,17 @@ body {
   font-family: 'Glegoo', serif;
   font-size: 4em;
   margin: 0;
-  padding: 0; }
+  padding: 0;
+  overflow: hidden; }
 
 .title {
   text-align: center;
   height: 20%;
   margin-bottom: 1em; }
+
+img {
+  height: 1.5em;
+  width: 1.5em; }
 
 .modal {
   background-color: #3DE37B;
@@ -131,11 +136,28 @@ form {
     cursor: pointer;
     background-color: #EEEEEE; }
 
-.results {
+.page_two {
   height: 100vh;
   width: 100vw;
-  background-color: #3DE37B;
+  background-color: #3DE37B; }
+
+.up_button {
+  color: white;
+  background-color: #3DE37B; }
+
+.go_up {
   margin-top: 20vh;
+  height: 20vh;
+  display: flex;
+  justify-content: center;
+  align-items: center; }
+  .go_up:hover {
+    cursor: pointer; }
+
+.results {
+  height: 80vh;
+  width: 100vw;
+  background-color: #3DE37B;
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -148,15 +170,17 @@ form {
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column; }
+  flex-direction: column;
+  display: none;
+  transition: display 100ms; }
 
 .third {
-  flex-shrink: 3;
   width: 30vw;
-  height: 25vw;
+  height: 20vw;
   padding: .6em;
-  box-sizing: border-box;
-  display: none; }
+  box-sizing: border-box; }
+  .third:hover {
+    transform: scale(1.5); }
 
 .glowing {
   background-color: white;
@@ -178,6 +202,9 @@ form {
   color: white;
   margin: auto auto auto auto;
   font-size: 1.7em; }
+
+.splash {
+  animation: pulser 4s infinite linear; }
 
 .sk-folding-cube {
   margin: 20px auto;
@@ -260,3 +287,12 @@ form {
     -webkit-transform: perspective(140px) rotateY(180deg);
     transform: perspective(140px) rotateY(180deg);
     opacity: 0; } }
+@keyframes pulser {
+  0% {
+    transform: scale(1); }
+  25% {
+    transform: scale(1.1); }
+  75% {
+    transform: scale(0.9); }
+  100% {
+    transform: scale(1); } }
