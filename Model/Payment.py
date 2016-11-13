@@ -5,3 +5,4 @@ class Payment():
         self.sender = sender
         self.reciever = receiver
         self.amount = amount
+    

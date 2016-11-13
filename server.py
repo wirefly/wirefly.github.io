@@ -1,8 +1,10 @@
 from flask import Flask, request
 from optparse import OptionParser
+import optimal_flow as of
 import simulate
-import json
-from Model import Currency, Account, Payment
+
+from Model import Currency, Account, Payment, capital_one as co
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -18,21 +20,22 @@ def retrieve_command():
 
     fromCurrency = Currency(from_curr)
     toCurrency = Currency(to_curr)
-    sender = Account(uid, in_name, fromCurrency, False)
-    receiver = Account(uid, out_name, toCurrency, False)
+    sender = addCustomer("Sender","Account" , from_curr, False)
+    receiver = addCustomer("Receiver","Account" , to_curr, False)
     payment = Payment(sender, receiver, _amount)
 
+    paymentList = simulatePayments(co.getAllAccounts())
     paymentList.append(payment)
+    finalListPayments = solve_optimal(paymentList)
+    for p in finalListPayments:
+        co.transfer(p.sender, p.receiver, p.amount)
+
 
     return 'Internal Cots, External Cost, (Maybe) Money Saved'
 
 
 if __name__ == "__main__":
-    with open('../rates.json') as json_data:
-        d = json.load(json_data)
-        rateDict = d
-    paymentList = simulatePaymets()
-    transactionList = mipAlgorithm(paymentList)
+
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="portnum", help="Enter port number for server", metavar=False)
     options, args = parser.parse_args()
