@@ -58,9 +58,6 @@ class BipartiteNetworkGraph:
         else:
             return []
 
-    def get_edges(self):
-        return np.argwhere(self.matrix > 0)
-
     def flatten_matrix(self):
         return self.L_to_R.reshape((self.L_to_R.shape[0] * self.L_to_R.shape[1],))
 

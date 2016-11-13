@@ -26,10 +26,10 @@ def initialize(payments_list):
     """
     net_payments = calculate_net_payments(payments_list)
     losers = [(net_amount, currency) for net_amount, currency in net_payments if net_amount < 0]
-    gainers = [(net_amount, currency) for net_amount, currency in net_payments if net_amount > 0]   # TODO: Handle == 0 case
+    gainers = [(net_amount, currency) for net_amount, currency in net_payments if net_amount > 0]
     L, R = len(losers), len(gainers)
     V = len(net_payments)
-    cost_graph, capacity_graph = BipartiteNetworkGraph(V), BipartiteNetworkGraph(V)
+    cost_graph, capacity_graph = BipartiteNetworkGraph(L, R), BipartiteNetworkGraph(L, R)
 
     for index, (net_amount, currency) in enumerate(net_payments):
         v = index + 1
