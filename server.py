@@ -1,6 +1,7 @@
 from flask import Flask, request
 from optparse import OptionParser
 import simulate
+import json
 from Model import Currency, Account, Payment
 
 app = Flask(__name__)
@@ -27,9 +28,11 @@ def retrieve_command():
 
 
 if __name__ == "__main__":
+    with open('../rates.json') as json_data:
+        d = json.load(json_data)
+        rateDict = d
     paymentList = simulatePaymets()
     transactionList = mipAlgorithm(paymentList)
-
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="portnum", help="Enter port number for server", metavar=False)
     options, args = parser.parse_args()
