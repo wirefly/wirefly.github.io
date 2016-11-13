@@ -11,8 +11,7 @@ class Currency:
         self.country = country
 
     def get_fee_rate(self, currency):
-        # return np.random.uniform(0.1, 2)
-        return 0.1
+        return np.random.uniform(0.1, 0.2)
 
     def getExchangeRate(self, currency):
         with open('../rates.json') as json_data:
