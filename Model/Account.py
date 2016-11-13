@@ -10,3 +10,5 @@ class Account:
 
     def getCurrency(self):
         return self.currency
+    def printAccount(self):
+    	print(self.uid + " " + self.name + " " + self.currency + " " + str(self.isBank) + "\n")

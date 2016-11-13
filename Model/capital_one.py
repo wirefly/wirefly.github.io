@@ -1,9 +1,10 @@
 import requests
+import random
 import json
 from Account import Account
 
 apiKey = 'f1eefaa9631867b1e47580406a2dcc83'
-
+currency_list = ['USD', 'IDR', 'BGN', 'ILS', 'GBP', 'DKK', 'CAD', 'JPY', 'HUF', 'RON', 'MYR', 'SEK', 'SGD', 'HKD', 'AUD', 'CHF', 'KRW', 'CNY', 'TRY', 'HRK', 'NZD', 'THB', 'EUR', 'NOK', 'RUB', 'INR', 'MXN', 'CZK', 'BRL', 'PLN', 'PHP', 'ZAR']
 def addCustomer(first_name, last_name, currency, isBank):
     url = 'http://api.reimaginebanking.com/customers/?key={}'.format(apiKey)
 
@@ -25,7 +26,7 @@ def addCustomer(first_name, last_name, currency, isBank):
     )
     data = response.json()
     if response.status_code == 201:
-        print('customer created')
+        #print('customer created')
         customerId = data['objectCreated']['_id']
         return addAccount(first_name, last_name, customerId, currency, isBank)
     else:
@@ -39,7 +40,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
         "type": "Savings",
         "nickname": "test",
         "rewards": 10000,
-        "balance": 1000000000,
+        "balance": 1000000000
     }
     # Create a Savings Account
     response = requests.post(
@@ -49,7 +50,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
     )
     data = response.json()
     if response.status_code == 201:
-        print('account created')
+        #print('account created')
         accountId = data['objectCreated']['_id']
         name = first_name + " " + last_name
         account = Account(accountId, name, currency, isBank)
@@ -63,6 +64,41 @@ def getAllCustomers():
     response = requests.get(url)
     print(response.status_code)
     if response.status_code == 200:
+        print(response.text)
+    else:
+        print("failed bitch ", response.text, response.reason)
+
+def generateCustomers():
+    customers = []
+    for x in range(0, 200):#Change the second argument to specify how many customers we want
+        customers.append(addCustomer("Customer", "Account", random.choice(currency_list), False))
+    for c in currency_list:
+        customers.append(addCustomer("Bank", "Account", c, True))
+    return customers
+def getAllAccounts():
+    url = 'http://api.reimaginebanking.com/accounts/?key={}'.format(apiKey)
+    response = requests.get(url)
+    print(response.status_code)
+    if response.status_code == 200:
+        print(response.text)
+    else:
+        print("failed bitch ", response.text, response.reason)
+def transfer(payer_id, payee_id, amount):
+    url = 'http://api.reimaginebanking.com/accounts/{}/transfers/?key={}'.format(payer_id, apiKey)
+    payload = {
+      "medium": "balance",
+      "payee_id": payee_id,
+      "amount": amount,
+      "transaction_date": "2016-11-13",
+      "description": "transfer"
+    }
+    response = requests.post(
+            url,
+            data=json.dumps(payload),
+            headers={'content-type': 'application/json'},
+    )
+    print(response.status_code)
+    if response.status_code == 201:
         print(response.text)
     else:
         print("failed bitch ", response.text, response.reason)
