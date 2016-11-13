@@ -29,13 +29,14 @@ def retrieve_command():
     finalListPayments = solve_optimal(paymentList)
     for p in finalListPayments:
         co.transfer(p.sender, p.receiver, p.amount)
+        if p.receiver.uid == receiver.uid {
+            
+        }
 
-
-    return 'Internal Cots, External Cost, (Maybe) Money Saved'
+    return 
 
 
 if __name__ == "__main__":
-
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="portnum", help="Enter port number for server", metavar=False)
     options, args = parser.parse_args()
