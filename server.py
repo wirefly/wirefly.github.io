@@ -1,12 +1,15 @@
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from optparse import OptionParser
 import optimal_flow as of
 import simulate
 from Model import Currency, Account, Payment, capital_one as co
 
 
-app = Flask(__name__, static_url_path='')
+app = Flask(__name__)
+app._static_folder = ''
 # app.config.from_object(__name__)
+
+user_list = None
 
 @app.route('/getConversion')
 def retrieve_command():
@@ -20,7 +23,7 @@ def retrieve_command():
     receiver = co.addCustomer("Receiver", "Account", to_curr, False)
     payment = Payment.Payment(sender, receiver, _amount)
 
-    paymentList = simulate.simulate.simulatePaymets(co.getAllAccounts())
+    paymentList = simulate.simulate.simulatePaymets(user_list)
     # paymentList.append(payment)
     # finalListPayments = of.solve_optimal(paymentList)
     finalRate = None
@@ -33,14 +36,11 @@ def retrieve_command():
 
     return finalValue, finalRate
 
-@app.route("/")
-def index():
-    return app.send_static_file('index.html')
-
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option("-p", "--port", dest="portnum", help="Enter port number for server", metavar=False)
     options, args = parser.parse_args()
+    user_list = co.getAllCustomers()
     if options.portnum is None:
         app.run(debug=True)
     else:

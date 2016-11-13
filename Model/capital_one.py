@@ -1,7 +1,9 @@
 import requests
 import random
 import json
-from Model import Account
+# from Model import Account, Currency
+from Model.Account import Account
+from Model.Currency import Currency
 
 apiKey = 'f1eefaa9631867b1e47580406a2dcc83'
 currency_list = ['USD', 'IDR', 'BGN', 'ILS', 'GBP', 'DKK', 'CAD', 'JPY', 'HUF', 'RON', 'MYR', 'SEK', 'SGD', 'HKD', 'AUD', 'CHF', 'KRW', 'CNY', 'TRY', 'HRK', 'NZD', 'THB', 'EUR', 'NOK', 'RUB', 'INR', 'MXN', 'CZK', 'BRL', 'PLN', 'PHP', 'ZAR']
