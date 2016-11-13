@@ -38,7 +38,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
     url = 'http://api.reimaginebanking.com/customers/{}/accounts?key={}'.format(customerId, apiKey)
     payload = {
         "type": "Savings",
-        "nickname": "test",
+        "nickname": currency,
         "rewards": 10000,
         "balance": 1000000000
     }
@@ -53,7 +53,7 @@ def addAccount(first_name, last_name, customerId, currency, isBank):
         #print('account created')
         accountId = data['objectCreated']['_id']
         name = first_name + " " + last_name
-        account = Account(accountId, name, currency, isBank)
+        account = Account(accountId, name, Currency(currency), isBank)
         return account
     else:
         print("failed bitch ", response.text, response.reason)
@@ -75,7 +75,7 @@ def generateCustomers():
     for c in currency_list:
         customers.append(addCustomer("Bank", "Account", c, True))
     return customers
-def getAllAccounts():
+def printAllAccounts():
     url = 'http://api.reimaginebanking.com/accounts/?key={}'.format(apiKey)
     response = requests.get(url)
     print(response.status_code)
@@ -83,6 +83,32 @@ def getAllAccounts():
         print(response.text)
     else:
         print("failed bitch ", response.text, response.reason)
+def getAllAccounts(): #returns a list of all accounts in Account objects
+    url = 'http://api.reimaginebanking.com/accounts/?key={}'.format(apiKey)
+    response = requests.get(url)
+    print(response.status_code)
+    if response.status_code == 200:
+        print(response.text)
+    else:
+        print("failed bitch ", response.text, response.reason)
+    data = response.json()
+    acctList = []
+    for x in range(0, len(data)):
+        url_acct = 'http://api.reimaginebanking.com/customers/{}/?key={}'.format(data[x]['customer_id'], apiKey)
+        response_acct = requests.get(url_acct)
+        #print(response_acct.status_code)
+        if response_acct.status_code == 200:
+            print(response_acct.text)
+        else:
+            print("failed bitch ", response_acct.text, response_acct.reason)
+        data_acct = response_acct.json()
+        uid = data[x]['_id']
+        name = data_acct['first_name'] + " " + data_acct['last_name']
+        currency = data[x]['nickname']
+        isBank = data_acct['address']['street_name']
+        balance = data[x]['balance']
+        acctList.append(Account(uid, name, currency, isBank, balance))
+    return acctList
 def transfer(payer_id, payee_id, amount):
     url = 'http://api.reimaginebanking.com/accounts/{}/transfers/?key={}'.format(payer_id, apiKey)
     payload = {
